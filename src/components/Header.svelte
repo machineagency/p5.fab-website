@@ -31,7 +31,7 @@
 <header>
 	<div class="nav-bar">
 		<div class="nav-left">
-			<a class="logo" href="/"> p5.fab </a>
+			<a class="logo" href="/explore"> p5.fab </a>
 		</div>
 
 		<div class="nav-right">
