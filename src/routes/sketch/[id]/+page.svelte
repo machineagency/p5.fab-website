@@ -13,6 +13,7 @@
 	import SignUp from '../../../components/SignUp.svelte';
 	import RemixPane from '../../../components/RemixPane.svelte';
 	import Split from 'split.js';
+	import EditorLog from '../../../components/EditorLog.svelte';
 
 	let { data } = $props(); // to pass in dynamic parameters, setup in +page.js
 	let initIframe = $state(false);
@@ -20,11 +21,13 @@
 	let objectID = $state();
 
 	async function fetchSketchData() {
+		console.log('fetching sketch data');
 		objectID = data.id;
 		if (objectID == 'new') {
 			editorState.savedSketchData = {
 				new: true
 			};
+			editorState.sketchIsFork = false;
 			return;
 		} else {
 			const sketchData = await getPostFromDB(objectID);
@@ -40,12 +43,16 @@
 	}
 
 	function loadSketchData(sketchData) {
+		console.log('loading sketch data');
 		editorState.globalSketch = sketchData.code;
 		console.log(sketchData.code);
 		editorState.projectTitle = sketchData.name;
 		editorState.currentObjectID = objectID;
 		editorState.savedSketchData = sketchData; // might need to do other stuff with this?
+		editorState.sketchIsFork = sketchData.isFork;
+		console.log(editorState.sketchIsFork);
 		evalSketch(editorState.globalSketch);
+		console.log('loading sketch data done');
 	}
 
 	onMount(() => {
@@ -64,8 +71,10 @@
 	});
 
 	function handleIframeLoad() {
+		console.log('iframe loaded');
 		const sketchWindow = document.getElementById('preview');
 		editorState.sketchWindow = sketchWindow;
+		console.log('going to eval sketch in iFrame load');
 		evalSketch(editorState.globalSketch);
 	}
 </script>
@@ -74,6 +83,10 @@
 	<EditorHeader />
 	{#if editorState.displaySaveScreen}
 		<EditorShare />
+	{/if}
+
+	{#if editorState.displayLogScreen}
+		<EditorLog />
 	{/if}
 
 	{#if !store.user && store.displayLogin}
